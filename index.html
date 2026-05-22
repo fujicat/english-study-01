@@ -1,0 +1,999 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="theme-color" content="#f1e9d2">
+  <title>Homestay English | ホームステイイングリッシュ</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    html, body { background-color: #f1e9d2; }
+    body { margin: 0; }
+  </style>
+</head>
+<body>
+  <div id="root">
+    <div style="min-height: 100vh; display: flex; align-items: center; justify-content: center; font-family: monospace; color: #57534e; letter-spacing: 0.2em; font-size: 13px;">
+      LOADING…
+    </div>
+  </div>
+  <script type="text/babel" data-presets="react">
+    const { useState, useEffect, useRef, useCallback } = React;
+
+    /* ===== SVG icon components (lucide-style) ===== */
+    const Svg = ({ size = 16, children, className = '', ...rest }) => (
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        width={size}
+        height={size}
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        className={className}
+        {...rest}
+      >
+        {children}
+      </svg>
+    );
+    const Settings = (p) => (
+      <Svg {...p}>
+        <path d="M12.22 2h-.44a2 2 0 0 0-2 2v.18a2 2 0 0 1-1 1.73l-.43.25a2 2 0 0 1-2 0l-.15-.08a2 2 0 0 0-2.73.73l-.22.38a2 2 0 0 0 .73 2.73l.15.1a2 2 0 0 1 1 1.72v.51a2 2 0 0 1-1 1.74l-.15.09a2 2 0 0 0-.73 2.73l.22.38a2 2 0 0 0 2.73.73l.15-.08a2 2 0 0 1 2 0l.43.25a2 2 0 0 1 1 1.73V20a2 2 0 0 0 2 2h.44a2 2 0 0 0 2-2v-.18a2 2 0 0 1 1-1.73l.43-.25a2 2 0 0 1 2 0l.15.08a2 2 0 0 0 2.73-.73l.22-.39a2 2 0 0 0-.73-2.73l-.15-.08a2 2 0 0 1-1-1.74v-.5a2 2 0 0 1 1-1.74l.15-.09a2 2 0 0 0 .73-2.73l-.22-.38a2 2 0 0 0-2.73-.73l-.15.08a2 2 0 0 1-2 0l-.43-.25a2 2 0 0 1-1-1.73V4a2 2 0 0 0-2-2z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </Svg>
+    );
+    const Volume2 = (p) => (
+      <Svg {...p}>
+        <polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/>
+        <path d="M15.54 8.46a5 5 0 0 1 0 7.07"/>
+        <path d="M19.07 4.93a10 10 0 0 1 0 14.14"/>
+      </Svg>
+    );
+    const ChevronLeft = (p) => (
+      <Svg {...p}><polyline points="15 18 9 12 15 6"/></Svg>
+    );
+    const ChevronRight = (p) => (
+      <Svg {...p}><polyline points="9 18 15 12 9 6"/></Svg>
+    );
+    const X = (p) => (
+      <Svg {...p}><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></Svg>
+    );
+    const Upload = (p) => (
+      <Svg {...p}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="17 8 12 3 7 8"/>
+        <line x1="12" y1="3" x2="12" y2="15"/>
+      </Svg>
+    );
+    const Download = (p) => (
+      <Svg {...p}>
+        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+        <polyline points="7 10 12 15 17 10"/>
+        <line x1="12" y1="15" x2="12" y2="3"/>
+      </Svg>
+    );
+    const RotateCcw = (p) => (
+      <Svg {...p}>
+        <polyline points="1 4 1 10 7 10"/>
+        <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10"/>
+      </Svg>
+    );
+    const Shuffle = (p) => (
+      <Svg {...p}>
+        <polyline points="16 3 21 3 21 8"/>
+        <line x1="4" y1="20" x2="21" y2="3"/>
+        <polyline points="21 16 21 21 16 21"/>
+        <line x1="15" y1="15" x2="21" y2="21"/>
+        <line x1="4" y1="4" x2="9" y2="9"/>
+      </Svg>
+    );
+    const Eye = (p) => (
+      <Svg {...p}>
+        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+        <circle cx="12" cy="12" r="3"/>
+      </Svg>
+    );
+    const AlertCircle = (p) => (
+      <Svg {...p}>
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </Svg>
+    );
+    const Check = (p) => (
+      <Svg {...p}><polyline points="20 6 9 17 4 12"/></Svg>
+    );
+
+
+const DEFAULT_PHRASES = [
+  {n:1,en:"Hi. / Hello",ja:"こんにちは。"},
+  {n:2,en:"Good morning",ja:"おはよう。"},
+  {n:3,en:"Good night.",ja:"おやすみ。"},
+  {n:4,en:"Good bye.",ja:"さようなら。"},
+  {n:5,en:"See you again",ja:"また会いましょう。"},
+  {n:6,en:"How are you?",ja:"お元気ですか。"},
+  {n:7,en:"I'm fine thank you. And you?",ja:"元気です。あなたはどうですか。"},
+  {n:8,en:"How do you do?",ja:"はじめまして。"},
+  {n:9,en:"What's your name?",ja:"あなたの名前は何ですか。"},
+  {n:10,en:"My name is Yuriko Sato.",ja:"私の名前は佐藤百合子です。"},
+  {n:11,en:"Nice to meet you. I am Taro Yamada.",ja:"お会いできて嬉しいです。私は山田太郎です。"},
+  {n:12,en:"Will you introduce me to Mr. Brown?",ja:"私をブラウンさんに紹介してください。"},
+  {n:13,en:"He is staying with Mr. Smith.",ja:"彼はスミスさんの所に滞在しています。"},
+  {n:14,en:"Who is this?",ja:"こちらはどなたですか。"},
+  {n:15,en:"This is my brother Tom.",ja:"こちらは私の兄のトムです。"},
+  {n:16,en:"What is this?",ja:"これは何ですか。"},
+  {n:17,en:"This is Mexican food.",ja:"これはメキシコ料理です。"},
+  {n:18,en:"You look nice.",ja:"似合っていますよ。"},
+  {n:19,en:"Excuse me. Excuse me but……",ja:"失礼します。 失礼ですが。"},
+  {n:20,en:"Pardon?",ja:"もう一度おっしゃってください。"},
+  {n:21,en:"I don't understand.",ja:"わかりません。"},
+  {n:22,en:"I can't catch you.",ja:"あなたの言っていることがわかりません。"},
+  {n:23,en:"What do you mean?",ja:"どういう意味ですか?"},
+  {n:24,en:"What do you say in English?",ja:"英語では何といいますか"},
+  {n:25,en:"Will you please speak more slowly?",ja:"もっとゆっくり話してもらえませんか。"},
+  {n:26,en:"How many brothers and sisters do you have?",ja:"兄弟、姉妹は何人いますか。"},
+  {n:27,en:"I have a brother and a sister.",ja:"兄(弟)が一人と姉(妹)が一人います。"},
+  {n:28,en:"How old are you?",ja:"何才ですか。"},
+  {n:29,en:"I am 14 years old.",ja:"14才です。"},
+  {n:30,en:"What grade are you in?",ja:"あなたは何年生ですか。"},
+  {n:31,en:"I'm in the 8th grade.",ja:"私は中学2年生です。"},
+  {n:32,en:"Where are you from?",ja:"どこから来たのですか。"},
+  {n:33,en:"I am from Kagoshima, Japan.",ja:"日本の鹿児島から来ました。"},
+  {n:34,en:"I'm tired. How about you?",ja:"私は疲れました。あなたはどうですか。"},
+  {n:35,en:"I am not sure.",ja:"よくわかりません。"},
+  {n:36,en:"I'm sorry, I don't know.",ja:"すみませんが知りません。"},
+  {n:37,en:"I am interested in music.",ja:"私は音楽に興味があります。"},
+  {n:38,en:"I'm looking for my camera.",ja:"私のカメラを探しています。"},
+  {n:39,en:"I am going to my friend's house.",ja:"友達の家に行く所です。"},
+  {n:40,en:"I'm sorry to be late.",ja:"遅れてすみません。"},
+  {n:41,en:"I am lost.",ja:"道に迷いました。"},
+  {n:42,en:"I'm home.",ja:"ただいま。"},
+  {n:43,en:"What's your address?",ja:"住所はどちらですか。"},
+  {n:44,en:"What's the name of the song?",ja:"その歌の名前は何ですか。"},
+  {n:45,en:"What sports do you like?",ja:"何のスポーツが好きですか。"},
+  {n:46,en:"What does your father do?",ja:"あなたのお父さんは何をしていますか。"},
+  {n:47,en:"I practice Judo at school.",ja:"私は学校で柔道をしています。"},
+  {n:48,en:"Let me show you around.",ja:"私に案内させてください。"},
+  {n:49,en:"Come this way.",ja:"こちらに来なさい。"},
+  {n:50,en:"Come here.",ja:"ここに来なさい。"},
+  {n:51,en:"Sure.",ja:"いいですよ。"},
+  {n:52,en:"I think so.",ja:"私はそう思います。"},
+  {n:53,en:"I see.",ja:"なるほど。"},
+  {n:54,en:"Exactly.",ja:"その通りです。"},
+  {n:55,en:"Really?",ja:"本当ですか。"},
+  {n:56,en:"Don't give up.",ja:"あきらめないで。"},
+  {n:57,en:"Don't worry.",ja:"心配しないで。"},
+  {n:58,en:"Don't cry.",ja:"泣かないで。"},
+  {n:59,en:"Never mind.",ja:"気にしないで。"},
+  {n:60,en:"Be quiet.",ja:"静かにしなさい。"},
+  {n:61,en:"Please.",ja:"どうぞ。"},
+  {n:62,en:"Thank you. No thank you.",ja:"ありがとう。いいえ結構です。"},
+  {n:63,en:"You're welcome.",ja:"どういたしまして。"},
+  {n:64,en:"My pleasure.",ja:"こちらこそ。"},
+  {n:65,en:"Help yourself to the ice cream!",ja:"どうぞアイスクリームを召し上がってください。"},
+  {n:66,en:"Here you are.",ja:"はい、どうぞ。"},
+  {n:67,en:"Are you hungry?",ja:"おなかがすいていますか。"},
+  {n:68,en:"No thanks, I'm full.",ja:"いいえ、結構です。おなか一杯です。"},
+  {n:69,en:"I would like some more bread.",ja:"もう少しパンが欲しいです。"},
+  {n:70,en:"I'd like to mail a letter.",ja:"手紙を出したいです。"},
+  {n:71,en:"I like this.",ja:"私はこれが好きです。"},
+  {n:72,en:"This is useful.",ja:"これは役に立ちます。"},
+  {n:73,en:"This is nice.",ja:"これはすばらしいです。"},
+  {n:74,en:"May I please have some coke?",ja:"コーラを飲んでもいいですか。"},
+  {n:75,en:"May I have another slice of toast?",ja:"もう一枚トーストを食べてもいいですか。"},
+  {n:76,en:"May I come in?",ja:"入ってもいいですか。"},
+  {n:77,en:"May I borrow your dictionary?",ja:"あなたの辞書を借りてもいいですか。"},
+  {n:78,en:"May I take a shower?",ja:"シャワーを浴びてもいいですか。"},
+  {n:79,en:"May I use your phone?",ja:"電話を使ってもいいですか。"},
+  {n:80,en:"May I ask you a favor?",ja:"お願いをしてもいいですか。"},
+  {n:81,en:"May I turn on the television?",ja:"テレビをつけてもいいですか。"},
+  {n:82,en:"May I bring my friends?",ja:"友達を連れてきてもいいですか。"},
+  {n:83,en:"May I visit Mr. Green's house after school next Friday?",ja:"来週の金曜日の放課後にグリーンさんの家を訪ねてもいいですか。"},
+  {n:84,en:"May I ask you a question?",ja:"質問してもいいですか。"},
+  {n:85,en:"May I help you?",ja:"お手伝いしましょうか。"},
+  {n:86,en:"May I go with you?",ja:"あなたと一緒に行ってもいいですか。"},
+  {n:87,en:"May I see that?",ja:"それを見ていいですか。"},
+  {n:88,en:"May I take a walk?",ja:"散歩をしていいですか。"},
+  {n:89,en:"Can I help with anything?",ja:"何かお手伝いしましょうか。"},
+  {n:90,en:"Shall I help you cook?",ja:"料理をするのを手伝いましょうか。"},
+  {n:91,en:"Shall I put the glasses on the table?",ja:"テーブルの上にコップを並べましょうか。"},
+  {n:92,en:"Shall I help you wash the dishes?",ja:"お皿を洗うのを手伝いましょうか。"},
+  {n:93,en:"Will you please explain that again?",ja:"それをもう一度説明してもらえませんか。"},
+  {n:94,en:"Will you have coke or milk?",ja:"コーラか牛乳を飲みませんか。"},
+  {n:95,en:"Will you pass the sugar?",ja:"砂糖を取ってくれませんか。"},
+  {n:96,en:"Will you shut the window?",ja:"窓を閉めてもらえませんか。"},
+  {n:97,en:"Will you come with me?",ja:"私と一緒に来ませんか。"},
+  {n:98,en:"Will you tell me about that?",ja:"それについて教えてくれませんか。"},
+  {n:99,en:"Will you stop at the post office?",ja:"郵便局で止めてもらえませんか。"},
+  {n:100,en:"Will you drive me home?",ja:"家まで乗せていってもらえませんか。"},
+  {n:101,en:"Will you take me to the shopping center?",ja:"ショッピングセンターまで連れていってもらえませんか。"},
+  {n:102,en:"Will you come and pick me up here?",ja:"私を迎えに来てもらえませんか。"},
+  {n:103,en:"Please tell me how to use your washing machine.",ja:"洗濯機の使い方を教えてください。"},
+  {n:104,en:"Please show me how to make the bed.",ja:"ベッドメーキングの仕方を教えてください。"},
+  {n:105,en:"Please show me how to use the phone.",ja:"電話の使い方を教えてください。"},
+  {n:106,en:"Would you please help me with my homework?",ja:"宿題を手伝ってもらえませんか。"},
+  {n:107,en:"Would you like some more potatoes?",ja:"じゃがいもをもう少しいかがですか。"},
+  {n:108,en:"Would you do me a favor?",ja:"お願いがあるのですが。"},
+  {n:109,en:"Would you mind if I join you?",ja:"私も参加していいですか。"},
+  {n:110,en:"Where were you born?",ja:"あなたはどこで生まれたのですか。"},
+  {n:111,en:"I was born in Kagoshima, Japan.",ja:"私は日本の鹿児島で生まれました。"},
+  {n:112,en:"Where are we?",ja:"ここはどこですか。"},
+  {n:113,en:"Where are you? I am at school.",ja:"あなたはどこにいますか。私は学校にいます。"},
+  {n:114,en:"Where is the bathroom?",ja:"お手洗いはどこですか。"},
+  {n:115,en:"Where do I put my dirty clothes?",ja:"洗濯物はどこにおけばいいですか。"},
+  {n:116,en:"Where do you sell T-shirts?",ja:"Tシャツはどこで売っていますか。"},
+  {n:117,en:"Where do you want to go?",ja:"あなたはどこに行きたいですか。"},
+  {n:118,en:"Let's go swimming.",ja:"泳ぎに行きましょう。"},
+  {n:119,en:"Let's play a Nintendo game.",ja:"ゲームをしましょう。"},
+  {n:120,en:"Let's take a break.",ja:"休みましょう。"},
+  {n:121,en:"I was told to bring a sack lunch.",ja:"お弁当を持ってくるように言われました。"},
+  {n:122,en:"What do you want for lunch?",ja:"昼食は何がいいですか。"},
+  {n:123,en:"I can eat anything.",ja:"何でも食べられます。"},
+  {n:124,en:"Do you want an apple or a banana?",ja:"りんごが欲しいですか。それともバナナですか。"},
+  {n:125,en:"I want to have a sandwich and some fruit.",ja:"サンドウィッチと果物が少しほしいです。"},
+  {n:126,en:"I want to buy some juice.",ja:"ジュースを買いたいです。"},
+  {n:127,en:"I want to go to bed.",ja:"寝たいです。"},
+  {n:128,en:"I don't like onions or carrots.",ja:"玉ねぎとにんじんが嫌いです。"},
+  {n:129,en:"What kind of food do you like?",ja:"どんな食べ物が好きですか。"},
+  {n:130,en:"What's your favorite vegetable?",ja:"あなたの好きな野菜は何ですか。"},
+  {n:131,en:"My favorite subject is English.",ja:"私の好きな科目は英語です。"},
+  {n:132,en:"What's for dinner?",ja:"夕食は何ですか。"},
+  {n:133,en:"What shall we do today?",ja:"今日は何をしましょうか。"},
+  {n:134,en:"What are you going to do?",ja:"何をするつもりですか。"},
+  {n:135,en:"What time will you come home?",ja:"何時に家に帰りますか。"},
+  {n:136,en:"What time must I come home? Come home at 6.",ja:"私は何時に帰らねばなりませんか。6時に帰って来なさい。"},
+  {n:137,en:"I'll come back about 2 o'clock.",ja:"2時に戻ってきます。"},
+  {n:138,en:"I'll be right back.",ja:"すぐに戻ります。"},
+  {n:139,en:"I must be going now.",ja:"もう帰らねばなりません。"},
+  {n:140,en:"Have a good time.",ja:"楽しんでいらっしゃい。"},
+  {n:141,en:"I'll do my best.",ja:"最善を尽くします。"},
+  {n:142,en:"I need to go to a bank.",ja:"銀行に行く必要があります。"},
+  {n:140,en:"I need a blanket.",ja:"毛布が必要です。"},
+  {n:140,en:"I have a stomachache.",ja:"胃が痛みます。"},
+  {n:145,en:"I have a cough.",ja:"せきがでます。"},
+  {n:146,en:"I have no time.",ja:"時間がありません。"},
+  {n:147,en:"I have just done it.",ja:"ちょうどそれを終えたばかりです。"},
+  {n:148,en:"I lost some money.",ja:"お金をなくしました。"},
+  {n:149,en:"I left my camera at school.",ja:"学校にカメラを忘れました。"},
+  {n:150,en:"I don't have enough money.",ja:"充分なお金を持っていません。"},
+  {n:151,en:"I feel sick.",ja:"気分が悪いです。"},
+  {n:152,en:"I got carsick.",ja:"車に酔いました。"},
+  {n:153,en:"Did you have a nice day?",ja:"楽しかったですか。"},
+  {n:154,en:"It was very interesting.",ja:"とてもおもしろかったです。"},
+  {n:155,en:"What time is it?",ja:"今何時ですか。"},
+  {n:156,en:"It is 8 o'clock.",ja:"8時です。"},
+  {n:157,en:"What do you want me to do?",ja:"私に何をしてほしいですか。"},
+  {n:158,en:"Please clean your room",ja:"あなたの部屋を掃除してください。"},
+  {n:159,en:"What are you doing?",ja:"何をしているのですか。"},
+  {n:160,en:"Are you hungry? Yes, I am. No, I am not.",ja:"おなかがすいていますか。はい、すいています。いいえ、すいていません。"},
+  {n:161,en:"Are you ready?",ja:"準備はできましたか。"},
+  {n:162,en:"Are you bored?",ja:"たいくつですか。"},
+  {n:163,en:"Are you happy?",ja:"楽しいですか。"},
+  {n:164,en:"Are you free this evening?",ja:"今晩おひまですか。"},
+  {n:165,en:"Can you speak English? Yes, I can. No, I can't.",ja:"英語を話せますか。はい、話せます。いいえ、話せません。"},
+  {n:166,en:"Can you guess what this is?",ja:"これは何だと思いますか。"},
+  {n:167,en:"Can you come here by six?",ja:"6時までにここに来ることができますか。"},
+  {n:168,en:"Can you do this?",ja:"これをできますか。"},
+  {n:169,en:"I can make Sukiyaki.",ja:"スキヤキを作れます。"},
+  {n:170,en:"I can't swim.",ja:"私は泳げません。"},
+  {n:171,en:"I cannot go there today.",ja:"今日そこへは行けません。"},
+  {n:172,en:"Do you want to learn Japanese? Yes, I do. No, I don't.",ja:"日本語を学びたいですか。はい、学びたいです。いいえ、学びたくありません。"},
+  {n:173,en:"Do you like cereal?",ja:"シリアルは好きですか。"},
+  {n:174,en:"Do you ever play the piano?",ja:"ピアノをひきますか。"},
+  {n:175,en:"Do you have an idea for a souvenir?",ja:"お土産に何かいい考えがありますか。"},
+  {n:176,en:"Do you know where it is?",ja:"それはどこにあるか知っていますか。"},
+  {n:177,en:"Have you ever been to Japan? Yes, I have. No, I haven't.",ja:"日本に行ったことがありますか。はい、あります。いいえ、ありません。"},
+  {n:178,en:"Have you heard about that?",ja:"それについて聞いたことがありますか。"},
+  {n:179,en:"By the way, have you ever seen a Kimono?",ja:"ところで、着物を見たことがありますか。"},
+  {n:180,en:"How is the weather today?",ja:"今日の天気はどうですか。"},
+  {n:181,en:"It is very hot today. It's cool today.",ja:"今日はとても暑いです。今日は涼しいです。"},
+  {n:182,en:"How long are you going to stay in America?",ja:"アメリカにどのくらい滞在するのですか。"},
+  {n:183,en:"I will stay a few weeks.",ja:"数週間滞在します。"},
+  {n:184,en:"How long will it take?",ja:"どのくらいの時間がかかりますか。"},
+  {n:185,en:"It will take a few more hours.",ja:"あと数時間かかります。"},
+  {n:186,en:"How do you spend your free time?",ja:"ひまな時は何をしていますか。"},
+  {n:187,en:"I play with my friends.",ja:"友達と遊んでいます。"},
+  {n:188,en:"How much is this?",ja:"これはいくらですか。"},
+  {n:189,en:"It's $2.79. (two dollars and seventy nine cents)",ja:"それは2ドル79セントです。"},
+  {n:190,en:"How often do you eat meat?",ja:"何回ぐらい肉を食べますか。"},
+  {n:191,en:"How often do you go to the mall?",ja:"何回ぐらいお店に行きますか。"},
+  {n:192,en:"We go about twice a week.",ja:"週に約2回行きます。"},
+  {n:193,en:"How was school?",ja:"学校はどうでしたか。"},
+  {n:194,en:"Great!",ja:"楽しかったです。"},
+  {n:195,en:"How do you like it?",ja:"それを気に入りましたか。"},
+  {n:196,en:"Fantastic!",ja:"すばらしい!"},
+  {n:197,en:"How about this?",ja:"これはどうですか。"},
+  {n:198,en:"Nice!",ja:"いいですね!"},
+  {n:199,en:"Who went with you?",ja:"誰と一緒に行きましたか。"},
+  {n:200,en:"What do you think of this?",ja:"これをどう思いますか。"},
+  {n:201,en:"What's the difference between this and that?",ja:"これとあれの違いは何ですか。"},
+  {n:202,en:"When did you come to America?",ja:"いつアメリカに来ましたか。"},
+  {n:203,en:"When did you arrive in Portland?",ja:"ポートランドにいつ着きましたか。"},
+  {n:204,en:"Where did you go?",ja:"どこに行きましたか。"},
+  {n:205,en:"Where are you going?",ja:"どこに行くのですか。"},
+  {n:206,en:"Why don't you sit here?",ja:"ここにすわったらどうですか。"},
+  {n:207,en:"How do you get there?",ja:"そこへはどうやって行くのですか。"},
+  {n:208,en:"Which do you like better?",ja:"どちらが好きですか。"},
+  {n:209,en:"Which is better?",ja:"どちらがいいですか。"},
+  {n:210,en:"Which way do we go?",ja:"どちらの方へ行くのですか。"},
+  {n:211,en:"It's easy.",ja:"簡単です。"},
+  {n:212,en:"It's difficult.",ja:"難しいです。"},
+  {n:213,en:"It's mine.",ja:"それは私の物です。"},
+  {n:214,en:"It's nothing.",ja:"何でもありません。"},
+  {n:215,en:"It was a delicious dinner.",ja:"ごちそうさまでした。"},
+  {n:216,en:"It must be interesting.",ja:"それはおもしろいにちがいない。"},
+  {n:217,en:"This drink is too hot.",ja:"この飲物は熱すぎます。"},
+  {n:218,en:"This tastes good.",ja:"これはおいしいです。"},
+  {n:219,en:"That's a good idea.",ja:"それはいい考えです。"},
+  {n:220,en:"That's too bad.",ja:"お気の毒に。"},
+  {n:221,en:"Is that all?",ja:"それで全部ですか。"},
+  {n:222,en:"Is there a souvenir shop near here?",ja:"この近くにお土産屋がありますか。"},
+  {n:223,en:"Is that so?",ja:"そうですか。"},
+  {n:224,en:"Do you have a smaller size?",ja:"もう少し小さいサイズがありますか。"},
+  {n:225,en:"No problem.",ja:"問題ありません。"},
+  {n:226,en:"Is this made in U.S.A.?",ja:"これはアメリカ製ですか。"},
+  {n:227,en:"Is this all right (O.K.)?",ja:"これでいいですか。"},
+  {n:228,en:"Are you O.K.?",ja:"大丈夫ですか。"},
+  {n:229,en:"Congratulations!",ja:"おめでとう!"},
+  {n:230,en:"You did a good job.",ja:"よくやったね!"},
+  {n:231,en:"Here is something for you.",ja:"これをあなたにさしあげます。"},
+  {n:232,en:"This is for you.",ja:"これをどうぞ。"},
+  {n:233,en:"I hope you like it.",ja:"気にいると思います。"},
+  {n:234,en:"Thank you for your present.",ja:"贈物をありがとうございます。"},
+  {n:235,en:"I'm glad you like it.",ja:"気に入ってもらえて嬉しいです。"},
+  {n:236,en:"May I take your picture?",ja:"あなたの写真を撮ってもいいですか。"},
+  {n:237,en:"I'll never forget your kindness.",ja:"あなたのご親切は決して忘れません。"},
+  {n:238,en:"Thank you for everything.",ja:"いろいろとありがとうございました。"}
+];
+
+const MODES = {
+  en2ja:    { label: '英 → 日',   q: 'en', a: 'ja', voice: false },
+  ja2en:    { label: '日 → 英',   q: 'ja', a: 'en', voice: false },
+  en2voice: { label: '英 → 🔊', q: 'en', a: 'en', voice: true  },
+  ja2voice: { label: '日 → 🔊', q: 'ja', a: 'en', voice: true  },
+};
+
+const STYLE = `
+@import url('https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,400;0,500;0,600;1,400&family=Noto+Serif+JP:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600&family=Bebas+Neue&display=swap');
+
+:root {
+  --paper: #f1e9d2;
+  --paper-light: #faf3df;
+  --paper-card: #fbf6e6;
+  --ink: #1c1917;
+  --ink-soft: #57534e;
+  --ink-muted: #a8a29e;
+  --red: #9a2515;
+  --red-soft: #b8341c;
+  --red-bg: rgba(154, 37, 21, 0.08);
+  --blue: #1e3a5c;
+  --green: #2d5a3d;
+  --rule: rgba(28, 25, 23, 0.18);
+  --rule-soft: rgba(28, 25, 23, 0.08);
+}
+
+.paper {
+  background-color: var(--paper);
+  background-image:
+    radial-gradient(circle at 18% 20%, rgba(154, 37, 21, 0.04) 0%, transparent 40%),
+    radial-gradient(circle at 82% 80%, rgba(30, 58, 92, 0.05) 0%, transparent 40%),
+    repeating-linear-gradient(0deg, rgba(0,0,0,0.012) 0px, rgba(0,0,0,0.012) 1px, transparent 1px, transparent 3px);
+}
+
+.paper-card {
+  background-color: var(--paper-card);
+  box-shadow:
+    0 1px 0 rgba(255, 250, 235, 0.6) inset,
+    0 1px 2px rgba(28, 25, 23, 0.06),
+    0 8px 24px rgba(28, 25, 23, 0.07),
+    0 20px 40px rgba(28, 25, 23, 0.04);
+  border: 1px solid var(--rule-soft);
+}
+
+.font-display { font-family: 'Bebas Neue', sans-serif; letter-spacing: 0.06em; }
+.font-serif-en { font-family: 'Lora', 'Noto Serif JP', Georgia, serif; }
+.font-serif-ja { font-family: 'Noto Serif JP', serif; }
+.font-mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
+
+.ink { color: var(--ink); }
+.ink-soft { color: var(--ink-soft); }
+.ink-muted { color: var(--ink-muted); }
+.red-ink { color: var(--red); }
+.blue-ink { color: var(--blue); }
+
+.btn-primary {
+  background: var(--ink);
+  color: var(--paper-light);
+  transition: transform 0.12s ease, background 0.15s ease, box-shadow 0.15s ease;
+  box-shadow: 0 2px 0 rgba(28, 25, 23, 0.4);
+}
+.btn-primary:not(:disabled):hover {
+  background: var(--red);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 rgba(154, 37, 21, 0.4);
+}
+.btn-primary:not(:disabled):active {
+  transform: translateY(1px);
+  box-shadow: 0 1px 0 rgba(28, 25, 23, 0.4);
+}
+.btn-primary:disabled { opacity: 0.25; cursor: not-allowed; }
+
+.btn-ghost {
+  background: transparent;
+  color: var(--ink);
+  border: 1px solid var(--rule);
+  transition: all 0.12s ease;
+}
+.btn-ghost:not(:disabled):hover {
+  background: rgba(28, 25, 23, 0.05);
+  border-color: var(--ink-soft);
+}
+.btn-ghost:disabled { opacity: 0.25; cursor: not-allowed; }
+
+.tab {
+  background: transparent;
+  color: var(--ink-soft);
+  border: 1px solid transparent;
+  transition: all 0.12s ease;
+}
+.tab:hover {
+  color: var(--ink);
+  background: rgba(28, 25, 23, 0.04);
+}
+.tab-active {
+  background: var(--ink);
+  color: var(--paper-card);
+  border-color: var(--ink);
+}
+
+.dashed-rule {
+  background-image: linear-gradient(to right, var(--rule) 50%, transparent 50%);
+  background-size: 8px 1px;
+  background-repeat: repeat-x;
+  background-position: center;
+  height: 1px;
+}
+
+.reveal {
+  animation: reveal 0.35s cubic-bezier(0.2, 0.7, 0.3, 1);
+}
+@keyframes reveal {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.json-input {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+  line-height: 1.55;
+  color: var(--ink);
+  background: rgba(255, 251, 235, 0.5);
+  border: 1px solid var(--rule);
+}
+.json-input:focus {
+  outline: none;
+  border-color: var(--red);
+  box-shadow: 0 0 0 2px var(--red-bg);
+}
+
+.serial-num {
+  font-family: 'JetBrains Mono', monospace;
+  letter-spacing: 0.15em;
+  color: var(--ink-muted);
+  font-size: 11px;
+}
+
+.app-title-rule {
+  background: repeating-linear-gradient(90deg, var(--red) 0 4px, transparent 4px 8px);
+  height: 2px;
+}
+`;
+
+function shuffleArr(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function App() {
+  const [phrases, setPhrases] = useState(DEFAULT_PHRASES);
+  const [loaded, setLoaded] = useState(false);
+  const [modeId, setModeId] = useState('en2ja');
+  const [shuffled, setShuffled] = useState(false);
+  const [order, setOrder] = useState(() => DEFAULT_PHRASES.map((_, i) => i));
+  const [pos, setPos] = useState(0);
+  const [showAnswer, setShowAnswer] = useState(false);
+  const [settingsOpen, setSettingsOpen] = useState(false);
+
+  const mode = MODES[modeId];
+  const current = phrases[order[pos]];
+
+  useEffect(() => {
+    (async () => {
+      try {
+        const stored = (() => { try { const v = localStorage.getItem('phrases'); return v ? { value: v } : null; } catch(e) { return null; } })();
+        if (stored && stored.value) {
+          const parsed = JSON.parse(stored.value);
+          if (Array.isArray(parsed) && parsed.length > 0) {
+            setPhrases(parsed);
+          }
+        }
+      } catch (e) {}
+      setLoaded(true);
+    })();
+  }, []);
+
+  useEffect(() => {
+    const base = phrases.map((_, i) => i);
+    setOrder(shuffled ? shuffleArr(base) : base);
+    setPos(0);
+    setShowAnswer(false);
+  }, [phrases, shuffled]);
+
+  useEffect(() => {
+    setShowAnswer(false);
+    try { window.speechSynthesis?.cancel(); } catch (e) {}
+  }, [modeId]);
+
+  const speak = useCallback((text) => {
+    if (!('speechSynthesis' in window)) return;
+    window.speechSynthesis.cancel();
+    const u = new SpeechSynthesisUtterance(text);
+    u.lang = 'en-US';
+    u.rate = 0.9;
+    u.pitch = 1;
+    window.speechSynthesis.speak(u);
+  }, []);
+
+  useEffect(() => {
+    if (showAnswer && mode.voice && current) {
+      speak(current.en);
+    }
+  }, [showAnswer, modeId, pos]);
+
+  const next = () => {
+    try { window.speechSynthesis?.cancel(); } catch (e) {}
+    setShowAnswer(false);
+    setPos(p => Math.min(p + 1, order.length - 1));
+  };
+  const prev = () => {
+    try { window.speechSynthesis?.cancel(); } catch (e) {}
+    setShowAnswer(false);
+    setPos(p => Math.max(p - 1, 0));
+  };
+  const restart = () => {
+    try { window.speechSynthesis?.cancel(); } catch (e) {}
+    setShowAnswer(false);
+    setPos(0);
+    if (shuffled) setOrder(shuffleArr(phrases.map((_, i) => i)));
+  };
+
+  useEffect(() => {
+    const handler = (e) => {
+      if (settingsOpen) return;
+      const tag = e.target.tagName;
+      if (tag === 'TEXTAREA' || tag === 'INPUT') return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); next(); }
+      else if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+      else if (e.key === ' ' || e.key === 'Enter') {
+        e.preventDefault();
+        if (!showAnswer) setShowAnswer(true);
+        else if (mode.voice) speak(current?.en || '');
+        else next();
+      }
+    };
+    window.addEventListener('keydown', handler);
+    return () => window.removeEventListener('keydown', handler);
+  });
+
+  if (!loaded) {
+    return (
+      <div className="paper min-h-screen flex items-center justify-center">
+        <span className="font-mono ink-muted text-sm tracking-widest">LOADING…</span>
+        <style>{STYLE}</style>
+      </div>
+    );
+  }
+
+  if (!current) {
+    return (
+      <div className="paper min-h-screen flex items-center justify-center">
+        <span className="font-serif-ja ink">問題集が空です。設定から読み込んでください。</span>
+        <style>{STYLE}</style>
+      </div>
+    );
+  }
+
+  const questionText = mode.q === 'en' ? current.en : current.ja;
+  const answerText   = mode.a === 'en' ? current.en : current.ja;
+  const qIsEn = mode.q === 'en';
+  const aIsEn = mode.a === 'en';
+
+  return (
+    <div className="paper min-h-screen ink">
+      <style>{STYLE}</style>
+
+      <div className="max-w-3xl mx-auto px-4 py-6 md:py-10">
+        {/* HEADER */}
+        <header className="mb-6">
+          <div className="flex items-start justify-between gap-4">
+            <div className="min-w-0">
+              <div className="font-display text-4xl md:text-5xl tracking-wider red-ink leading-none">
+                HOMESTAY ENGLISH
+              </div>
+              <div className="app-title-rule my-2.5 max-w-xs"></div>
+              <div className="font-serif-ja text-xs md:text-sm ink-soft">
+                ホームステイイングリッシュ 第1章 暗記用フレーズ集
+              </div>
+            </div>
+            <button
+              onClick={() => setSettingsOpen(true)}
+              className="btn-ghost rounded-full p-2.5 shrink-0"
+              title="設定"
+              aria-label="設定"
+            >
+              <Settings size={18} />
+            </button>
+          </div>
+        </header>
+
+        {/* CONTROL BAR */}
+        <div className="paper-card rounded-2xl px-4 py-3 mb-5 flex flex-wrap items-center justify-between gap-3">
+          <div className="flex gap-1 flex-wrap">
+            {Object.entries(MODES).map(([id, m]) => (
+              <button
+                key={id}
+                onClick={() => setModeId(id)}
+                className={`tab ${modeId === id ? 'tab-active' : ''} font-serif-ja px-3 py-1.5 rounded-full text-xs md:text-sm`}
+              >
+                {m.label}
+              </button>
+            ))}
+          </div>
+          <button
+            onClick={() => setShuffled(s => !s)}
+            className={`tab ${shuffled ? 'tab-active' : ''} px-3 py-1.5 rounded-full text-xs md:text-sm font-serif-ja flex items-center gap-1.5`}
+            title="出題順を切替"
+          >
+            <Shuffle size={12} />
+            {shuffled ? 'ランダム' : '番号順'}
+          </button>
+        </div>
+
+        {/* MAIN CARD */}
+        <main>
+          <div className="paper-card rounded-2xl p-6 md:p-12">
+            <div className="flex items-center justify-between mb-8">
+              <span className="serial-num">No. {String(current.n).padStart(3, '0')}</span>
+              <span className="serial-num">{pos + 1} / {order.length}</span>
+            </div>
+
+            <div className="text-center flex flex-col justify-center" style={{ minHeight: 200 }}>
+              <div className={qIsEn ? 'font-serif-en' : 'font-serif-ja'}>
+                <p className="text-2xl md:text-3xl leading-snug ink">
+                  {questionText}
+                </p>
+              </div>
+
+              {showAnswer && (
+                <div className="mt-8 reveal">
+                  <div className="dashed-rule mb-6"></div>
+                  <div className="font-mono text-xs ink-muted tracking-widest mb-4">
+                    {mode.voice ? 'PRONUNCIATION' : 'ANSWER'}
+                  </div>
+                  {mode.voice ? (
+                    <div className="flex flex-col items-center gap-4">
+                      <button
+                        onClick={() => speak(current.en)}
+                        className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
+                      >
+                        <Volume2 size={18} />
+                        もう一度聞く
+                      </button>
+                      <p className="font-serif-en text-lg md:text-xl ink-soft italic">
+                        {current.en}
+                      </p>
+                    </div>
+                  ) : (
+                    <div className={aIsEn ? 'font-serif-en' : 'font-serif-ja'}>
+                      <p className="text-2xl md:text-3xl leading-snug red-ink">
+                        {answerText}
+                      </p>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {!showAnswer && (
+              <div className="mt-8 flex justify-center">
+                <button
+                  onClick={() => setShowAnswer(true)}
+                  className="btn-primary rounded-full px-8 py-3 flex items-center gap-2 font-serif-ja"
+                >
+                  {mode.voice ? (
+                    <><Volume2 size={18} />答えを聞く</>
+                  ) : (
+                    <><Eye size={18} />答えを表示</>
+                  )}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* NAV */}
+          <div className="flex items-center justify-between gap-3 mt-5">
+            <button
+              onClick={prev}
+              disabled={pos === 0}
+              className="btn-ghost rounded-full px-4 md:px-5 py-2.5 flex items-center gap-1.5 font-serif-ja text-sm"
+            >
+              <ChevronLeft size={18} />
+              前へ
+            </button>
+
+            <button
+              onClick={restart}
+              className="btn-ghost rounded-full p-2.5"
+              title="最初から(ランダム時は再シャッフル)"
+              aria-label="最初に戻る"
+            >
+              <RotateCcw size={15} />
+            </button>
+
+            <button
+              onClick={next}
+              disabled={pos === order.length - 1}
+              className="btn-primary rounded-full px-4 md:px-5 py-2.5 flex items-center gap-1.5 font-serif-ja text-sm"
+            >
+              次へ
+              <ChevronRight size={18} />
+            </button>
+          </div>
+
+          <div className="text-center mt-6 font-mono text-xs ink-muted tracking-widest hidden md:block">
+            ← / → 移動  ・  SPACE 答えを見る / 次へ
+          </div>
+        </main>
+      </div>
+
+      {settingsOpen && (
+        <SettingsModal
+          phrases={phrases}
+          setPhrases={setPhrases}
+          onClose={() => setSettingsOpen(false)}
+          defaultPhrases={DEFAULT_PHRASES}
+        />
+      )}
+    </div>
+  );
+}
+
+function SettingsModal({ phrases, setPhrases, onClose, defaultPhrases }) {
+  const [jsonText, setJsonText] = useState('');
+  const [error, setError] = useState('');
+  const [success, setSuccess] = useState('');
+  const [confirmReset, setConfirmReset] = useState(false);
+  const fileRef = useRef(null);
+
+  const clearMsgs = () => { setError(''); setSuccess(''); };
+
+  const importFromText = async (text) => {
+    clearMsgs();
+    try {
+      const parsed = JSON.parse(text);
+      if (!Array.isArray(parsed)) throw new Error('配列形式である必要があります');
+      if (parsed.length === 0) throw new Error('空の配列です');
+      const valid = parsed.every(item =>
+        item && typeof item === 'object' &&
+        typeof item.en === 'string' && item.en.length > 0 &&
+        typeof item.ja === 'string' && item.ja.length > 0
+      );
+      if (!valid) throw new Error('各項目に "en"(英文)と "ja"(日本語訳)が必要です');
+      const normalized = parsed.map((p, i) => ({
+        n: (typeof p.n === 'number' || typeof p.n === 'string') ? p.n : i + 1,
+        en: p.en,
+        ja: p.ja,
+      }));
+      setPhrases(normalized);
+      try {
+        localStorage.setItem('phrases', JSON.stringify(normalized));
+      } catch (e) {}
+      setSuccess(`${normalized.length} 件のフレーズを読み込みました`);
+      setJsonText('');
+    } catch (e) {
+      setError(e.message || '読み込みに失敗しました');
+    }
+  };
+
+  const handleFile = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      await importFromText(text);
+    } catch (err) {
+      setError('ファイルの読み込みに失敗しました');
+    } finally {
+      e.target.value = '';
+    }
+  };
+
+  const exportJson = () => {
+    clearMsgs();
+    try {
+      const data = JSON.stringify(phrases, null, 2);
+      const blob = new Blob([data], { type: 'application/json' });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'phrases.json';
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    } catch (e) {
+      setError('ダウンロードに失敗しました');
+    }
+  };
+
+  const doReset = async () => {
+    setPhrases(defaultPhrases);
+    try { localStorage.removeItem('phrases'); } catch (e) {}
+    setConfirmReset(false);
+    setSuccess('初期データに戻しました');
+  };
+
+  return (
+    <div
+      className="fixed inset-0 flex items-center justify-center p-4 z-50"
+      style={{ background: 'rgba(28, 25, 23, 0.5)' }}
+      onClick={onClose}
+    >
+      <div
+        className="paper-card rounded-2xl max-w-lg w-full overflow-y-auto" style={{ maxHeight: "90vh" }}
+        onClick={e => e.stopPropagation()}
+      >
+        <div className="flex items-center justify-between px-6 py-5 sticky top-0 z-10" style={{ background: 'var(--paper-card)', borderBottom: '1px solid var(--rule-soft)' }}>
+          <div>
+            <h2 className="font-display text-2xl tracking-wider red-ink leading-none">SETTINGS</h2>
+            <div className="font-serif-ja text-xs ink-soft mt-1">設定</div>
+          </div>
+          <button onClick={onClose} className="btn-ghost rounded-full p-2" aria-label="閉じる">
+            <X size={16} />
+          </button>
+        </div>
+
+        <div className="px-6 py-5 space-y-6">
+          <section>
+            <div className="font-mono text-xs ink-muted tracking-widest mb-2">CURRENT SET</div>
+            <p className="font-serif-ja ink">
+              <span className="font-mono text-lg">{phrases.length}</span> 件のフレーズ
+            </p>
+          </section>
+
+          {error && (
+            <div className="rounded-xl p-3 flex gap-2.5 items-start" style={{ background: 'var(--red-bg)' }}>
+              <AlertCircle size={16} className="red-ink shrink-0 mt-0.5" />
+              <p className="text-sm red-ink font-serif-ja">{error}</p>
+            </div>
+          )}
+          {success && (
+            <div className="rounded-xl p-3 flex gap-2.5 items-start" style={{ background: 'rgba(45, 90, 61, 0.08)' }}>
+              <Check size={16} className="shrink-0 mt-0.5" style={{ color: 'var(--green)' }} />
+              <p className="text-sm font-serif-ja" style={{ color: 'var(--green)' }}>{success}</p>
+            </div>
+          )}
+
+          <section>
+            <div className="font-mono text-xs ink-muted tracking-widest mb-3">IMPORT / EXPORT</div>
+            <div className="flex flex-col gap-2">
+              <input
+                type="file"
+                accept=".json,application/json"
+                ref={fileRef}
+                onChange={handleFile}
+                style={{ display: 'none' }}
+              />
+              <button
+                onClick={() => fileRef.current?.click()}
+                className="btn-ghost rounded-xl px-4 py-3 flex items-center gap-2.5 justify-center font-serif-ja text-sm"
+              >
+                <Upload size={15} />
+                JSONファイルを読み込む(上書き)
+              </button>
+              <button
+                onClick={exportJson}
+                className="btn-ghost rounded-xl px-4 py-3 flex items-center gap-2.5 justify-center font-serif-ja text-sm"
+              >
+                <Download size={15} />
+                現在のデータをダウンロード
+              </button>
+            </div>
+          </section>
+
+          <section>
+            <div className="font-mono text-xs ink-muted tracking-widest mb-2">PASTE JSON</div>
+            <textarea
+              value={jsonText}
+              onChange={e => setJsonText(e.target.value)}
+              placeholder={'[\n  {"n": 1, "en": "Hello", "ja": "こんにちは"}\n]'}
+              className="json-input w-full rounded-xl p-3 h-36 resize-y"
+            />
+            <button
+              onClick={() => importFromText(jsonText)}
+              disabled={!jsonText.trim()}
+              className="mt-2 btn-primary rounded-xl px-4 py-2 text-sm font-serif-ja"
+            >
+              貼り付けたJSONを読み込む
+            </button>
+          </section>
+
+          <section>
+            <div className="font-mono text-xs ink-muted tracking-widest mb-2">JSON FORMAT</div>
+            <div className="rounded-xl p-3.5" style={{ background: 'rgba(28, 25, 23, 0.04)' }}>
+              <pre className="font-mono text-xs ink-soft whitespace-pre-wrap leading-relaxed">{`[
+  {"n": 1, "en": "Hi.", "ja": "こんにちは。"},
+  {"n": 2, "en": "Good morning", "ja": "おはよう。"}
+]`}</pre>
+              <p className="mt-3 font-serif-ja text-xs ink-soft leading-relaxed">
+                <span className="red-ink font-mono">n</span> (任意・番号) ・
+                <span className="red-ink font-mono"> en</span> (必須・英文) ・
+                <span className="red-ink font-mono"> ja</span> (必須・日本語訳)
+              </p>
+            </div>
+          </section>
+
+          <section className="pt-2" style={{ borderTop: '1px solid var(--rule-soft)' }}>
+            <div className="font-mono text-xs ink-muted tracking-widest mb-3 mt-3">RESET</div>
+            {confirmReset ? (
+              <div className="rounded-xl p-4" style={{ background: 'var(--red-bg)' }}>
+                <p className="text-sm font-serif-ja mb-3 ink">
+                  現在のデータが初期データ(238件)に置き換わります。本当に戻しますか?
+                </p>
+                <div className="flex gap-2">
+                  <button onClick={doReset} className="btn-primary rounded-lg px-4 py-2 text-sm font-serif-ja">
+                    はい、戻す
+                  </button>
+                  <button onClick={() => setConfirmReset(false)} className="btn-ghost rounded-lg px-4 py-2 text-sm font-serif-ja">
+                    キャンセル
+                  </button>
+                </div>
+              </div>
+            ) : (
+              <button
+                onClick={() => setConfirmReset(true)}
+                className="btn-ghost rounded-xl px-4 py-2.5 text-sm flex items-center gap-2 font-serif-ja"
+              >
+                <RotateCcw size={14} />
+                初期データに戻す
+              </button>
+            )}
+          </section>
+
+          <p className="text-xs ink-muted font-serif-ja leading-relaxed pt-2" style={{ borderTop: '1px solid var(--rule-soft)' }}>
+            <span className="block pt-3">
+              データはお使いのブラウザに保存されます。同じブラウザで開けば次回も保持されます。
+            </span>
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+    /* ===== mount ===== */
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<App />);
+  </script>
+</body>
+</html>

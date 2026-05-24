@@ -353,10 +353,11 @@ const DEFAULT_PHRASES = [
 ];
 
 const MODES = {
-  en2ja:    { label: '英 → 日',   q: 'en', a: 'ja', voice: false },
-  ja2en:    { label: '日 → 英',   q: 'ja', a: 'en', voice: false },
-  en2voice: { label: '英 → 🔊', q: 'en', a: 'en', voice: true  },
-  ja2voice: { label: '日 → 🔊', q: 'ja', a: 'en', voice: true  },
+  en2ja:     { label: '英 → 日',  q: 'en',    a: 'ja', voice: false, autoPlay: false },
+  ja2en:     { label: '日 → 英',  q: 'ja',    a: 'en', voice: false, autoPlay: false },
+  en2voice:  { label: '英 → 🔊', q: 'en',    a: 'en', voice: true,  autoPlay: false },
+  ja2voice:  { label: '日 → 🔊', q: 'ja',    a: 'en', voice: true,  autoPlay: false },
+  listening: { label: '🔊 → 英', q: 'audio', a: 'en', voice: true,  autoPlay: true  },
 };
 
 const STYLE = `

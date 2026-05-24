@@ -561,6 +561,12 @@ function App() {
     }
   }, [showAnswer, modeId, pos]);
 
+  useEffect(() => {
+    if (!showAnswer && mode.autoPlay && current) {
+      speak(current.en);
+    }
+  }, [pos, modeId, showAnswer]);
+
   const next = () => {
     try { window.speechSynthesis?.cancel(); } catch (e) {}
     setShowAnswer(false);

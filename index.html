@@ -545,12 +545,12 @@ function App() {
     try { window.speechSynthesis?.cancel(); } catch (e) {}
   }, [modeId]);
 
-  const speak = useCallback((text) => {
+  const speak = useCallback((text, rate = 0.9) => {
     if (!('speechSynthesis' in window)) return;
     window.speechSynthesis.cancel();
     const u = new SpeechSynthesisUtterance(text);
     u.lang = 'en-US';
-    u.rate = 0.9;
+    u.rate = rate;
     u.pitch = 1;
     window.speechSynthesis.speak(u);
   }, []);
@@ -689,13 +689,21 @@ function App() {
               {isAudioQuestion ? (
                 <div className="flex flex-col items-center gap-6">
                   <Volume2 size={96} className="ink-soft" />
-                  <button
-                    onClick={() => speak(current.en)}
-                    className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
-                  >
-                    <Volume2 size={18} />
-                    REPLAY
-                  </button>
+                  <div className="flex flex-row items-center gap-3">
+                    <button
+                      onClick={() => speak(current.en)}
+                      className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
+                    >
+                      <Volume2 size={18} />
+                      REPLAY
+                    </button>
+                    <button
+                      onClick={() => speak(current.en, 0.1)}
+                      className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
+                    >
+                      🐢 ゆっくり
+                    </button>
+                  </div>
                 </div>
               ) : (
                 <div className={qIsEn ? 'font-serif-en' : 'font-serif-ja'}>
@@ -713,13 +721,21 @@ function App() {
                   </div>
                   {mode.voice ? (
                     <div className="flex flex-col items-center gap-4">
-                      <button
-                        onClick={() => speak(current.en)}
-                        className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
-                      >
-                        <Volume2 size={18} />
-                        もう一度聞く
-                      </button>
+                      <div className="flex flex-row items-center gap-3">
+                        <button
+                          onClick={() => speak(current.en)}
+                          className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
+                        >
+                          <Volume2 size={18} />
+                          もう一度聞く
+                        </button>
+                        <button
+                          onClick={() => speak(current.en, 0.1)}
+                          className="btn-primary rounded-full px-6 py-3 flex items-center gap-2 font-serif-ja text-sm"
+                        >
+                          🐢 ゆっくり
+                        </button>
+                      </div>
                       <p className="font-serif-en text-lg md:text-xl ink-soft italic">
                         {current.en}
                       </p>
